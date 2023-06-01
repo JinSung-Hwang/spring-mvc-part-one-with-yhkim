@@ -1,7 +1,9 @@
 package hello.springmvc.basic.request;
 
+import hello.springmvc.basic.HelloData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -111,5 +113,33 @@ public class RequestParamController {
 
     return "OK";
   }
+
+  // --------------- 아래는 @ModelAttribute 이다.
+  // @ModelAttribute도 1번, 2번 방식에서 사용하는 요청 파라미터 조회방식에서 사용하는 것이다. 3번 방식이 아니니 혼동하지 말자
+
+  @ResponseBody
+  @RequestMapping("/request-attribute-v1")
+  public String modelAttributeV1(@ModelAttribute HelloData helloData) { // @ModelAttribute는 helloData는 객체를 생성하고 파라미터가 username이면 setUsername() 메서드를 찾아서 호출하면서 값을 입력한다.
+//    HelloData helloData = new HelloData();
+//    helloData.setUsername(username);
+//    helloData.setAge(age);
+
+    log.info("required username={}, age={}", helloData.getUsername(), helloData.getAge());
+    log.info("helloData={}", helloData.toString());
+
+    return "OK";
+  }
+
+  @ResponseBody
+  @RequestMapping("/request-attribute-v2")
+  public String modelAttributeV2(HelloData helloData) { // @ModelAttribute는 생략 가능하다. // String, int, Interger같은 단순 타입이면 @RequestParam을 적용하고 나머지는 @ModelAttribute를 사용한다.
+    log.info("required username={}, age={}", helloData.getUsername(), helloData.getAge());
+    log.info("helloData={}", helloData.toString());
+
+    return "OK";
+  }
+
+
+
 
 }
