@@ -83,14 +83,25 @@ public class BasicItemController {
     return "basic/item";
   }
 
-  @PostMapping("/add")
+//  @PostMapping("/add")
   public String saveV4(Item item) { // @ModelAttribute 생략 가능
 
     itemRepository.save(item);
 //    model.addAttribute("item", item);
 
-    return "basic/item";
+    return "basic/item"; // 브라우저에서 상품 등록후 새로고침하면 계속해서 상품이 생성되는 문제가 있었다.
+    // 새로고침하면 이전에 했던 행동을 반복해주기 때문이다.
   }
+
+  @PostMapping("/add")
+  public String saveV5(Item item) { // @ModelAttribute 생략 가능
+
+    itemRepository.save(item);
+
+    return "redirect:/basic/items/" + item.getId();
+    // v4의 문제를 해결하기 위해서 Post Redirect Get - PRG 패턴을 이용한다.
+  }
+
 
   @GetMapping("/{itemId}/edit")
   public String editForm(@PathVariable Long itemId, Model model) {
