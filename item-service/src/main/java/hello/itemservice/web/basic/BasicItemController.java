@@ -5,10 +5,7 @@ import hello.itemservice.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -44,10 +41,58 @@ public class BasicItemController {
     return "basic/addForm";
   }
 
-  @PostMapping("/add") // GetMapping의 /add 경로에는 화면을 보여주고 PostMapping의 /add 경로에서는 실제 save API가 호출되도록함
-  public String save() {
-    return "basic/addForm";
+//  @PostMapping("/add") // GetMapping의 /add 경로에는 화면을 보여주고 PostMapping의 /add 경로에서는 실제 save API가 호출되도록함
+  public String saveV1(
+          @RequestParam String itemName,
+          @RequestParam int price,
+          @RequestParam Integer quantity,
+          Model model) {
+
+    Item item = new Item();
+    item.setItemName(itemName);
+    item.setPrice(price);
+    item.setQuantity(quantity);
+
+    itemRepository.save(item);
+
+    model.addAttribute("item", item);
+
+    return "basic/item";
   }
+
+//  @ModelAttribute가 하는 일 2가지
+//  1. 요청 파라미터 처리
+//      @ModelAttribute는 Item객체를 생성하고, 요청 파라미터의 값을 프로퍼티 접근법(setXXX)으로 입력해준다.
+//  2. Model 추가
+//      바로 Model에 @ModelAttribute로 지정한 객체를 자동으로 넣어준다. 72번 라인 참고
+//  @PostMapping("/add")
+  public String saveV2(@ModelAttribute("Item") Item item) {
+
+    itemRepository.save(item);
+//    model.addAttribute("item", item); // 자동 추가, 생략 가능
+
+    return "basic/item";
+  }
+
+//  @PostMapping("/add")
+  public String saveV3(@ModelAttribute Item item) {
+
+    itemRepository.save(item);
+//    model.addAttribute("item", item); // @ModelAttribute에 값을 안넣으면 @ModelAttribute 다음에 작성하는 객체의 첫글자를 소문자로 바꿔서 model.addAttribute에 넣어준다.
+
+    return "basic/item";
+  }
+
+  @PostMapping("/add")
+  public String saveV4(Item item) { // @ModelAttribute 생략 가능
+
+    itemRepository.save(item);
+//    model.addAttribute("item", item);
+
+    return "basic/item";
+  }
+
+
 
 
   @PostConstruct
