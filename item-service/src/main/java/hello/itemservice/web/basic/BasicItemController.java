@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -93,7 +94,7 @@ public class BasicItemController {
     // 새로고침하면 이전에 했던 행동을 반복해주기 때문이다.
   }
 
-  @PostMapping("/add")
+//  @PostMapping("/add")
   public String saveV5(Item item) { // @ModelAttribute 생략 가능
 
     itemRepository.save(item);
@@ -102,6 +103,13 @@ public class BasicItemController {
     // v4의 문제를 해결하기 위해서 Post Redirect Get - PRG 패턴을 이용한다.
   }
 
+  @PostMapping("/add")
+  public String saveV6(Item item, RedirectAttributes redirectAttributes) { // @ModelAttribute 생략 가능
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId()); // <---- redirect에 치환될 파라미터랑 동일하게 넣으면 치환되어서 값이 들어간다.
+    redirectAttributes.addAttribute("status", true); // <---- 만약 redirect에 치환될 파라미터가 없으면 queryString으로 넘어간다.
+    return "redirect:/basic/items/{itemId}"; // 기존 v5의 + item.getId(); 방식의 url표현방식은 encoding 문제가 있을수 있어서 위험하다. 하여 redirectAttributes.addAttribute 방식을 이용해야한다.
+  }
 
   @GetMapping("/{itemId}/edit")
   public String editForm(@PathVariable Long itemId, Model model) {
